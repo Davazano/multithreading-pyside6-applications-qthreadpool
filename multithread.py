@@ -1,6 +1,5 @@
 from PySide6.QtWidgets import QVBoxLayout, QLabel, QPushButton, QWidget, QMainWindow, QApplication
-from PySide6.QtCore import QTimer
-
+from PySide6.QtCore import QTimer, QRunnable, Slot, QThreadPool
 import sys
 import time
 
@@ -8,6 +7,9 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
+
+        self.threadpool = QThreadPool()
+        print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
 
         self.counter = 0
 
@@ -33,12 +35,29 @@ class MainWindow(QMainWindow):
         self.timer.start()
     
     def oh_no(self):
-        time.sleep(5)
+        worker = Worker()
+        self.threadpool.start(worker)
+        # time.sleep(5)
     
     def recurring_timer(self):
         self.counter += 1
         self.l.setText("Counter: %d" % self.counter)
 
+
+
+class Worker(QRunnable):
+    '''
+    Worker thread
+    '''
+
+    @Slot() # QtCore.Slot
+    def run(self):
+        '''
+        Your code goes in this function
+        '''
+        print("Thread start")
+        time.sleep(5)
+        print("Thread complete")
 
 app = QApplication(sys.argv)
 window = MainWindow()
