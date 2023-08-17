@@ -12,6 +12,7 @@ class MainWindow(QMainWindow):
         print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
 
         self.counter = 0
+        self.workerCount = 0
 
         layout = QVBoxLayout()
 
@@ -34,14 +35,15 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.recurring_timer)
         self.timer.start()
     
-    def execute_this_fn(self):
-        print("Hello!")
+    def execute_this_fn(self, worker):
+        print(f"started {worker} thread")
         time.sleep(5)
-        print("completed execute_this_fn!")
+        print(f"completed {worker} thread")
 
     def oh_no(self):
+        self.workerCount += 1
         # Pass the function to execute
-        worker = Worker(self.execute_this_fn)
+        worker = Worker(self.execute_this_fn, f"Worker {self.workerCount}")
 
         # Execute
         self.threadpool.start(worker)
